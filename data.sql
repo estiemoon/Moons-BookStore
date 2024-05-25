@@ -33,8 +33,16 @@ VALUES ("혹부리 영감", 22, 2, "ebook", 10, "노래 주머니..", "혹 두�
 
 SELECT * FROM books LEFT
 JOIN category ON books.category_id = category.id;
+-- me
+select *,categories.name as category from books left 
+JOIN categories on categories.id = books.category_id;
+-- song
+SELECT * FROM books LEFT 
+JOIN category ON books.category_id = category.id WHERE books.id=1;
 
-SELECT * FROM books LEFT JOIN category ON books.category_id = category.id WHERE books.id=1;
+//신간 SQL
+-- song
+SELECT * FROM books WHERE pub_date BETWEEN DATE_SUB(now(), INTERVAL 1 MONTH) AND NOW() 
 
 
 // 좋아요 추가
