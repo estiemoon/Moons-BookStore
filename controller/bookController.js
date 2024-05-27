@@ -1,5 +1,5 @@
 const conn = require('../mariadb');
-const { StatusCodes} = require('http-status-codes');
+const {StatusCodes} = require('http-status-codes');
 
 
 //카테고리별 Or 신간별 전체도서조회
@@ -9,7 +9,7 @@ const allBooks = (req,res)=> {
     news = news == 'true' ? true : false ;
     let offset = limit * (currentPage-1)
     
-    let sql = `SELECT * FROM books`; 
+    let sql = `SELECT *,(SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes FROM books`; 
     let values = [];
  
     if (category_id && news) {
@@ -39,13 +39,19 @@ const allBooks = (req,res)=> {
 };
 
 const eachBook = (req,res) => {
+    let {user_id} = req.body;
     let {id} = req.params;
     id = parseInt(id);
+
     
-    let sql = `SELECT * FROM books LEFT 
-               JOIN categories ON categories.id = books.category_id 
-               WHERE books.id = ?`;
-    conn.query(sql,id,
+    let sql = ` SELECT *,
+                (SELECT count(*) FROM likes WHERE books.id = liked_book_id) AS likes,
+                (SELECT count(*) FROM likes WHERE user_id = ? AND liked_book_id = ?) AS liked
+                FROM books LEFT 
+                JOIN categories ON categories.category_id = books.category_id 
+                WHERE books.id = ?`;
+    let values = [user_id,id,id];
+    conn.query(sql,values,
         (err,result)=>{
             if(err){
                 console.log(err);
