@@ -26,7 +26,7 @@ router
         }
     }
     ]
-    ,join);
+        ,join);
 
 //login
 router.post('/login',

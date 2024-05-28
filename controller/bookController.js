@@ -39,7 +39,7 @@ const allBooks = (req,res)=> {
 };
 
 const eachBook = (req,res) => {
-    let {user_id} = req.body;
+    let {user_id} = req.body; //header에서 받아와야함
     let {id} = req.params;
     id = parseInt(id);
 
