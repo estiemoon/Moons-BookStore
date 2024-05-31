@@ -15,7 +15,7 @@ const order = async (req,res) =>{
         dateStrings: true
     })
 
-    let {items, delivery, totalPrice, totalQuantity, userId} = req.body;
+    let {items, delivery, totalPrice, totalQuantity, bookTitle, userId} = req.body;
 
     let delivery_id;
     let order_id;
@@ -31,13 +31,13 @@ const order = async (req,res) =>{
         console.log('error1: ', e);
     }
 
-    try{
-        let sql4  = `SELECT title FROM books WHERE id = ?`
-        let [rows, fields] = await conn.execute(sql4, [items[0].book_id])
-        var bookTitle = rows[0].title;
-    } catch(e) {
-        console.log('error4: ', e);
-    }
+    // try{
+    //     let sql4  = `SELECT title FROM books WHERE id = ?`
+    //     let [rows, fields] = await conn.execute(sql4, [items[0].book_id])
+    //     var bookTitle = rows[0].title;
+    // } catch(e) {
+    //     console.log('error4: ', e);
+    // }
 
     try{
         let sql2 = `INSERT INTO orders(book_title, total_quantity, total_price, deliver_id, user_id)
@@ -49,22 +49,25 @@ const order = async (req,res) =>{
     } catch(e) {
         console.log('error2: ', e);
     }
-    
-    try{
-        let sql3 = `INSERT INTO orderedbooks (order_id, book_id, quantity) VALUES ?`;
-        let val3 = [];
-        items.forEach((item) => {
-            val3.push([order_id, item.book_id, item.quantity])
-        })
 
-        let [result3] = await conn.query(sql3, [val3]);
-        console.log('INSERT 결과', result3);
+    try{ //items = [1,2,3] 주문하는 도서 장바구니 cart 아이디
+        let val3;
+        let result3;
+        items.forEach(async (item) => {
+            let sql3 = `INSERT INTO orderedbooks (order_id, book_id, quantity) 
+            VALUES (?, 
+            (SELECT book_id FROM cartItems WHERE id = ?),
+            (SELECT quantity FROM cartItems WHERE id = ?));`;
+            val3 = [order_id,item,item];
+
+            await conn.execute(sql3, val3);
+        });
 
     } catch(e){
         console.log('error3: ', e);
     }
 
-    await deleteCartITem(conn,items);
+    await deleteCartITem(conn,items); //나머지도 모듈로 빼기
 
     res.status(StatusCodes.CREATED).end();
 
@@ -73,12 +76,7 @@ const order = async (req,res) =>{
 const deleteCartITem = async (conn,items) => {
     try{
         let sql5 = `DELETE FROM cartItems WHERE id IN (?)`;
-        let val5 = [];
-        items.forEach((item) => {
-            val5.push(item.cart_item);
-        })
-
-        var [result5] = await conn.query(sql5, [val5]);
+        var [result5] = await conn.query(sql5, [items]);
         console.log('result5: ', result5);
 
     } catch(e){
@@ -88,12 +86,53 @@ const deleteCartITem = async (conn,items) => {
     return result5
 }
 
-const getOrder = (req,res) =>{
-    res.send('getorder');
+const getOrder = async (req,res) =>{
+    const conn = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'Bookstore',
+        password: 'root',
+        dateStrings: true
+    })
+    let {userId} = req.body
+    try{
+        let sql = `SELECT orders.id, created_at, delivery.address, delivery.recipient, delivery.phoneNum, book_title,total_quantity,total_price
+                    FROM orders LEFT
+                    JOIN delivery
+                    ON orders.deliver_id = delivery.id
+                    WHERE orders.user_id = ?`;
+
+        var [getorders,fields] = await conn.query(sql,userId); //execute??
+
+    }catch(e){
+        console.log('getOrder Error', e);
+    }
+
+    res.status(StatusCodes.OK).json(getorders);
 };
 
-const getDetail = (req,res) =>{
-    res.send('getdetailorder');
+const getDetail = async (req,res) =>{
+    const conn = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'Bookstore',
+        password: 'root',
+        dateStrings: true
+    })
+    let {id} = req.params;
+    try{
+        let sql = `SELECT book_id, title,author,price,quantity
+                    FROM orderedbooks LEFT JOIN books
+                    ON orderedbooks.book_id = books.id
+                    WHERE order_id = ?`;
+
+        var [getdetails,fields] = await conn.query(sql,id ); //execute??
+
+    }catch(e){
+        console.log('getDetail Error', e);
+    }
+
+    res.status(StatusCodes.OK).json(getdetails);
 };
 
 module.exports = {order, getOrder, getDetail};
