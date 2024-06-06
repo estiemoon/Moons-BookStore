@@ -51,9 +51,11 @@ const login = (req,res)=> {
 
             if(user && currentPwd == user.password) { 
                 const token = jwt.sign(
-                                {email: email}, 
+                                {email: email,
+                                user_id : user.id
+                                }, 
                                 process.env.PRIVATE_KEY,
-                                {expiresIn : "2 days",
+                                {expiresIn : "10 mins",
                                 issuer : "moon"})
                 res
                     .cookie('token', token, {httpOnly : true})
