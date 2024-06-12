@@ -9,7 +9,6 @@ const allCategories = (req,res) => {
                 console.log(err);
                 return res.status(StatusCodes.BAD_REQUEST).end();
             }
-
             return res.status(StatusCodes.OK).json(result);
 
     })
