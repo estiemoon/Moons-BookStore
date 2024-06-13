@@ -1,4 +1,4 @@
-const {order} = require('../services/orderService');
+const {order, getOrder,getDetail} = require('../services/orderService');
 
 const mysql = require('mysql2/promise');
 const {StatusCodes} = require('http-status-codes');
@@ -18,14 +18,12 @@ const orderCon = async (req,res) =>{
             items,delivery,totalPrice,totalQuantity,bookTitle,userId,
         }
 
-        let result = await order(values,res)
-        console.log(result);
-        if (result instanceof Error) {
-            return res.status(StatusCodes.BAD_REQUEST).end();
+        try{
+            let result = await order(values,res) 
+            return res.status(StatusCodes.CREATED).json(result);
 
-        } else {
-            res.status(StatusCodes.CREATED).json(result);
-
+        } catch(e){
+            res.status(StatusCodes.BAD_REQUEST).end();
         }
 
     } else {
@@ -36,76 +34,45 @@ const orderCon = async (req,res) =>{
 
 
 
-const getOrder = async (req,res) =>{
-    const conn = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'Bookstore',
-        password: 'root',
-        dateStrings: true
-    })
+const getOrderCon = async (req,res) =>{
 
-    let authorization = ensureAuth(req,res);
-    let userId = authorization.user_id;
-    if (authorization instanceof jwt.TokenExpiredError) {
-        return res.status(StatusCodes.UNAUTHORIZED).json({
-            message : "로그인 세션 만료. 다시 로그인 하세요."
-        })
-    } else if (authorization instanceof jwt.JsonWebTokenError) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            message : "잘못된 토큰입니다."
-        })
-    } else {
+    if (req.isAuthenticated){
+        let authorization = req.user;
+        let userId = authorization.user_id;
+
         try{
-            let sql = `SELECT orders.id, created_at, delivery.address, delivery.recipient, delivery.phoneNum, book_title,total_quantity,total_price
-                        FROM orders LEFT
-                        JOIN delivery
-                        ON orders.deliver_id = delivery.id
-                        WHERE orders.user_id = ?`;
+            let result = await getOrder(userId, res);
+            return res.status(StatusCodes.OK).json(result);
 
-            var [getorders,fields] = await conn.query(sql,userId); //execute??
-
-        }catch(e){
-            console.log('getOrder Error', e);
+        } catch (err) {
+            return res.status(StatusCodes.BAD_REQUEST).end();
         }
 
-        res.status(StatusCodes.OK).json(getorders);
+    } else {
+        return res.status(StatusCodes.UNAUTHORIZED).end();
     }
+    
 };
 
-const getDetail = async (req,res) =>{
-    const conn = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'Bookstore',
-        password: 'root',
-        dateStrings: true
-    })
-    let {id} = req.params;
-    let authorization = ensureAuth(req,res);
-    if (authorization instanceof jwt.TokenExpiredError) {
-        return res.status(StatusCodes.UNAUTHORIZED).json({
-            message : "로그인 세션 만료. 다시 로그인 하세요."
-        })
-    } else if (authorization instanceof jwt.JsonWebTokenError) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            message : "잘못된 토큰입니다."
-        })
-    } else {
+const getDetailCon = async (req,res) =>{
+
+    if(req.isAuthenticated){
+        let {id} = req.params;
+
         try{
-            let sql = `SELECT book_id, title,author,price,quantity
-                        FROM orderedbooks LEFT JOIN books
-                        ON orderedbooks.book_id = books.id
-                        WHERE order_id = ?`;
+            let result = await getDetail(id, res);
+            return res.status(StatusCodes.OK).json(result);
 
-            var [getdetails,fields] = await conn.query(sql,id ); //execute??
-
-        }catch(e){
-            console.log('getDetail Error', e);
+        } catch (err) {
+            return res.status(StatusCodes.BAD_REQUEST).end();
         }
 
-        res.status(StatusCodes.OK).json(getdetails);
-    };
+    } else {
+        return res.status(StatusCodes.UNAUTHORIZED).end();
+    }
+
+
+
 };
 
-module.exports = {orderCon, getOrder, getDetail};
+module.exports = {orderCon, getOrderCon, getDetailCon};

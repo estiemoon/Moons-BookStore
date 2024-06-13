@@ -1,4 +1,4 @@
-const { addData,deleteData } = require('../models/orderModel');
+const { addData,deleteData,getOrderDB,getDetailDB } = require('../models/orderModel');
 
 const {StatusCodes} = require('http-status-codes');
 
@@ -16,7 +16,8 @@ const order = async (values,res) => {
         delivery_id = result1.insertId;
 
     } catch(e) {
-        throw new Error;
+        console.log("sql1 error: ", e);
+        throw e;
     }
 
     try{
@@ -25,36 +26,44 @@ const order = async (values,res) => {
         let val2 = [bookTitle ,totalQuantity, totalPrice, delivery_id, userId];
 
         let result2 = await addData(sql2,val2,res);
+        if (!result2){
+            throw new Error;
+        };
         order_id = result2.insertId;
     } catch(e) {
-        console.log("Sql2 Error")
-        throw new Error;
+        console.log("sql2 error: ", e);
+        throw e;
     }
 
     try{ //items = [1,2,3] 주문하는 도서 장바구니 cart 아이디
         let val3;
-        items.forEach(async (item) => {
+        let result3;
+        for (const item of items) {
             let sql3 = `INSERT INTO orderedbooks (order_id, book_id, quantity) 
             VALUES (?, 
             (SELECT book_id FROM cartItems WHERE id = ?),
             (SELECT quantity FROM cartItems WHERE id = ?));`;
             val3 = [order_id,item,item];
-
-            let result3 = await addData(sql3,val3,res)
-            console.log(result3)
-        });
+            result3 = await addData(sql3,val3,res)
+        };
 
     } catch(e) {
-        console.log("Sql3 Error")
-        throw new Error;
+        console.log("sql3 error: ", e);
+        throw e;
     }
 
-    result = await deleteCartITem(items,res); //나머지도 모듈로 빼기
-    if (result instanceof Error){
-        throw new Error;
-    }
+    let result;
+    //삽입 후 삭제 해야하는데 왜 sql5부터 실행이 되냐 이말이야?
+    try{
+        result = await deleteCartITem(items,res); //나머지도 모듈로 빼기
 
-    return result
+    } catch (e) {
+        console.log('삭제에러', e);
+        throw e;
+    }
+    
+    return result;
+
 }
 
 const deleteCartITem = async(items,res) =>{
@@ -62,24 +71,44 @@ const deleteCartITem = async(items,res) =>{
     try{
         let sql5 = `DELETE FROM cartItems WHERE id IN (?)`;
         result5 = await deleteData(sql5,items,res);
-        console.log('result5: ', result5);
-
-        return result5
-
     } catch(e) {
-        console.log("Sql5 Error")
-        console.log(e)
-        throw new Error;
+        console.log("sql5 error: ", e);
+        throw e;
+    }
+    return result5;
+}
+
+const getOrder = async(userId, res) => {
+    let sql = `SELECT orders.id, created_at, delivery.address, delivery.recipient, delivery.phoneNum, book_title,total_quantity,total_price
+    FROM orders LEFT
+    JOIN delivery
+    ON orders.deliver_id = delivery.id
+    WHERE orders.user_id = ?`;
+
+    try {
+        let result = await getOrderDB(sql,userId,res);
+        return result;
+    } catch (err) {
+        console.log("getOrder Err",err.name);
+        throw err;
     }
 }
 
-const getOrder = () => {
+const getDetail = async(id,res) => {
+
+    let sql = `SELECT book_id, title,author,price,quantity
+    FROM orderedbooks LEFT JOIN books
+    ON orderedbooks.book_id = books.id
+    WHERE order_id = ?`;
+
+    try{
+        let result = await getDetailDB(sql,id,res);
+        return result;
+    } catch (err) {
+        throw err;
+    }
 
 }
 
-const getDetail = () => {
 
-}
-
-
-module.exports = {order}
+module.exports = {order, getOrder,getDetail}

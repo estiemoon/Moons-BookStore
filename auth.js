@@ -5,7 +5,6 @@ const {StatusCodes} = require('http-status-codes');
 dotenv.config();
 
 const ensureAuth = (req,res,next) => {
-    console.log("인가 모듈이 실행되는 중입니다..")
     try {
         let receivedJwt = req.headers.authorization;
 
@@ -13,7 +12,6 @@ const ensureAuth = (req,res,next) => {
             let decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
             req.isAuthenticated = true;
             req.user = decodedJwt;
-            console.log(decodedJwt);
             next();
 
         } else {

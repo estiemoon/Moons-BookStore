@@ -28,7 +28,7 @@ const loginUser = async (email,password,res) => {
                         user_id : user.id
                         }, 
                         process.env.PRIVATE_KEY,
-                        {expiresIn : "10 mins",
+                        {expiresIn : "60 mins",
                         issuer : "moon"})
         res
             .cookie('token', token, {httpOnly : true})

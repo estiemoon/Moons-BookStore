@@ -13,12 +13,11 @@ const addData = async(sql,val,res) => {
     })
     try{
         let [result] = await conn.execute(sql,val);
-        console.log(result)
-        return
+        return result
 
     } catch (err) {
-        console.log("order model Error")
-        throw new Error;
+        console.log("orderModel_Add",err)
+        throw err;
     }
 }
 
@@ -33,21 +32,53 @@ const deleteData = async(sql,val,res) => {
     })
     try{
         let [result] = await conn.query(sql,[val]);
-        console.log(result)
         return result;
 
     } catch (err) {
-        console.log(err);
-        throw new Error;
+        console.log("orderModel_deleteData",err);
+        throw err;
     }
 }
 
-const getOrder = () => {
+const getOrderDB = async(sql,userId,res) => {
+    const conn = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'Bookstore',
+        password: 'root',
+        dateStrings: true
+    })
+
+    try{
+        let [getorders,fields] = await conn.query(sql,userId); //execute??
+
+        return getorders;
+    } catch (err) {
+        console.log("getOrderDb_Err", err.name);
+        throw err;
+    }
     
 }
 
-const getDetail = () => {
+const getDetailDB = async(sql,id,res) => {
+    const conn = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'Bookstore',
+        password: 'root',
+        dateStrings: true
+    })
+
+    try{
+        let [getdetails,fields] = await conn.query(sql,id); //execute??
+        return getdetails;
+        
+    } catch (err) {
+        console.log("getDetail_Err", err.name);
+        throw err;
+    }
+
 
 }
 
-module.exports = {addData,deleteData}
+module.exports = {addData,deleteData,getOrderDB,getDetailDB}

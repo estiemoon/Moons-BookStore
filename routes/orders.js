@@ -1,5 +1,5 @@
 const express = require('express');
-const {orderCon,getOrder,getDetail} = require('../controller/orderController');
+const {orderCon,getOrderCon,getDetailCon} = require('../controller/orderController');
 const router = express.Router();
 
 router.use(express.json());
@@ -7,9 +7,9 @@ const ensureAuth = require('../auth');
 
 router.post('/', ensureAuth, orderCon);
 
-router.get('/', ensureAuth, getOrder);
+router.get('/', ensureAuth, getOrderCon);
 
-router.get('/:id',ensureAuth, getDetail);
+router.get('/:id',ensureAuth, getDetailCon);
 
 
 
