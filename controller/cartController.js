@@ -3,9 +3,6 @@ const {addCart,allCart,removeCart} = require('../services/cartService');
 const {StatusCodes} = require('http-status-codes');
 
 
-const conn = require('../mariadb');
-const ensureAuth = require('../auth');
-
 const addCartCon = (req,res) => {
     if(req.isAuthenticated){
         let {book_id, quantity} = req.body;
@@ -19,7 +16,7 @@ const addCartCon = (req,res) => {
     }
 
 };
-
+ 
 const allCartsCon = (req,res) => { 
     if(req.isAuthenticated){
         let authorization = req.user;

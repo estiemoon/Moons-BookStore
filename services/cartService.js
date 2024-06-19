@@ -26,10 +26,9 @@ const allCart = async (items,values,res)=>{
         console.log('체크된 표시만 담습니다.')
         items = items.toString();
         sql += ` AND cartItems.id IN (?)`;
-        values.push(items); //배열 그자체로 넣어도 됨 
+        values.push(items.split(',')); 
     }  
     result = await allCartDB(sql,values,res);
-    console.log(result);
 
     if(result){
         res.status(StatusCodes.CREATED).json(result);

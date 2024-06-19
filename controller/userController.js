@@ -1,12 +1,5 @@
 const {createUser,loginUser,toReset,resetPwd} = require('../services/userService');
 
-const conn = require('../mariadb');
-const {StatusCodes} = require('http-status-codes');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-const crypto = require('crypto');
-
-dotenv.config();
 
 const join = (req,res)=> {
     let {email, password} = req.body;

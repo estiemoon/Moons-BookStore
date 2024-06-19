@@ -1,15 +1,14 @@
 const {join,login,toRequestReset,requestReset} = require('../controller/userController');
 const {validFunc} = require('../validator');
+const excRefresh = require('../refresh');
 
 const express = require('express');
 const {body, validationResult} = require('express-validator');
-const conn = require('../mariadb');
-const {StatusCodes} = require('http-status-codes');
-
 
 const router = express.Router();
-
 router.use(express.json());
+const cp = require('cookie-parser');
+router.use(cp());
 
 //join
 router
@@ -34,5 +33,7 @@ router.post('/reset',toRequestReset);
 //reset
 router.put('/reset',requestReset);
 
+//refresh
+router.get('/refresh', excRefresh );
 
 module.exports = router;

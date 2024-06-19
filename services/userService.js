@@ -1,7 +1,9 @@
 const {saveUser, getUser, getResetUser,updatePwd} = require('../models/userModel');
-
+const {sign,refresh} = require('../jwt-utils');
 const crypto = require('crypto');
 const {StatusCodes} = require('http-status-codes');
+const redis = require('redis');
+
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -18,20 +20,22 @@ const createUser = (email,password,res) => {
 
 const loginUser = async (email,password,res) => {
     let result = await getUser(email,res);
-    console.log(result)
-    let user = result[0]
+    let user = result[0];
     const currentPwd = crypto.pbkdf2Sync(password, user.salt,10000,10,'sha512').toString('base64');
 
     if(user && currentPwd == user.password) { 
-        const token = jwt.sign(
-                        {email: email,
-                        user_id : user.id
-                        }, 
-                        process.env.PRIVATE_KEY,
-                        {expiresIn : "60 mins",
-                        issuer : "moon"})
+        
+        const token = sign(user);
+        console.log("accesstoken", token);
+        const refreshToken = refresh();
+        console.log("refreshtoken", refreshToken);
+
+        const redisClient = redis.createClient(process.env.REDIS_PORT);
+        await redisClient.connect();
+        redisClient.set(toString(user.id), refreshToken);
+
         res
-            .cookie('token', token, {httpOnly : true})
+            .cookie('token', {token: token, refreshToken: refreshToken}, {httpOnly : true})
         res
             .status(StatusCodes.OK)
             .json(result)
@@ -40,7 +44,6 @@ const loginUser = async (email,password,res) => {
 
 const toReset = async (email,res)=>{
     const result = await getResetUser(email,res);
-    //user존재하는지 확인하는 로직!!!!!
     let user = result[0];
 
     if(user){
@@ -49,7 +52,7 @@ const toReset = async (email,res)=>{
         res.status(StatusCodes.NOT_FOUND).end();
     }
 
-}
+} 
 
 const resetPwd = async (email,password,res) => {
 
@@ -68,7 +71,6 @@ const resetPwd = async (email,password,res) => {
             });
     }
 }
-
 
 
 module.exports = {createUser,loginUser,toReset,resetPwd};

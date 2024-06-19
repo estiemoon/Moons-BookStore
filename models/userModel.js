@@ -2,7 +2,7 @@ const { check } = require('express-validator');
 //const conn = require('../mariadb');
 const {StatusCodes} = require('http-status-codes');
 const mysql = require('mysql2/promise');
-
+ 
 const saveUser = async (values,res) => {
     const conn = await mysql.createConnection({
         host: 'localhost',

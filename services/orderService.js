@@ -44,8 +44,10 @@ const order = async (values,res) => {
             (SELECT book_id FROM cartItems WHERE id = ?),
             (SELECT quantity FROM cartItems WHERE id = ?));`;
             val3 = [order_id,item,item];
-            result3 = await addData(sql3,val3,res)
+            result3 = await addData(sql3,val3,res);
         };
+
+        
 
     } catch(e) {
         console.log("sql3 error: ", e);
