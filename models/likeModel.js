@@ -22,4 +22,4 @@ const updateDB = async (sql,values,res)=>{
 }
 
 
-module.exports = {updateDB};
+module.exports = {updateDB}; 

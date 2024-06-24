@@ -1,39 +1,27 @@
-const {join,login,toRequestReset,requestReset} = require('../controller/userController');
-const {validFunc} = require('../validator');
-const excRefresh = require('../refresh');
-
 const express = require('express');
-const {body, validationResult} = require('express-validator');
-
 const router = express.Router();
+const {body} = require('express-validator');
 router.use(express.json());
-const cp = require('cookie-parser');
-router.use(cp());
 
-//join
-router
-    .post('/join',    
-    [   
-    body('email').notEmpty().isString().withMessage('이메일 필요'),
-    body('password').notEmpty().isString().withMessage('비밀번호 필요'),
-    validFunc
-    ],join);
+const {join,login,toRequestReset,requestReset} = require('../controller/userController');
+const {validFunc} = require('../middlewares/validator');
+const excRefresh = require('../middlewares/refresh');
 
-//login
-router.post('/login',
-    [   
-    body('email').notEmpty().isString().withMessage('이메일 필요'),
-    body('password').notEmpty().isString().withMessage('비밀번호 필요'),
-    validFunc
-    ],login );
+const validateEmailAndPwd = [ 
+                        body('email').notEmpty().isString().withMessage('이메일 필요'),
+                        body('password').notEmpty().isString().withMessage('비밀번호 필요'),
+                        validFunc]
 
-//to reset
-router.post('/reset',toRequestReset);
+router.post('/join',validateEmailAndPwd,join);
 
-//reset
-router.put('/reset',requestReset);
+router.post('/login',validateEmailAndPwd,login );
 
-//refresh
+router.post('/reset', 
+        [body('email').notEmpty().isString().withMessage('이메일 필요'), validFunc],
+        toRequestReset);
+
+router.put('/reset',validateEmailAndPwd,requestReset);
+
 router.get('/refresh', excRefresh );
 
 module.exports = router;

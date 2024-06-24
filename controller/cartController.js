@@ -1,13 +1,11 @@
 const {addCart,allCart,removeCart} = require('../services/cartService');
-
 const {StatusCodes} = require('http-status-codes');
-
 
 const addCartCon = (req,res) => {
     if(req.isAuthenticated){
         let {book_id, quantity} = req.body;
         let authorization = req.user;
-        let values = [book_id, quantity, authorization.user_id];
+        let values = [book_id, quantity, authorization.id];
     
         addCart(values,res);
 
@@ -20,7 +18,7 @@ const addCartCon = (req,res) => {
 const allCartsCon = (req,res) => { 
     if(req.isAuthenticated){
         let authorization = req.user;
-        values = [authorization.user_id];
+        values = [authorization.id];
         let {items} = req.body;
     
         allCart(items,values,res)
@@ -41,5 +39,4 @@ const deleteCartItemCon = (req,res) => {
     }
 };
 
-
-module.exports = {addCartCon, allCartsCon, deleteCartItemCon};
+module.exports = {addCartCon, allCartsCon, deleteCartItemCon}; 

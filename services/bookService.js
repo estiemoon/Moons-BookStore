@@ -1,17 +1,14 @@
 const {getAllBooks,getPagination,getDetail} = require('../models/bookModel');
-
 const {StatusCodes} = require('http-status-codes');
 
 const getBooks = async (val,res)=> {
     let allBooksRes = {};
     let {category_id,news,offset,limit,currentPage} = val
 
-
     let sql = ` SELECT SQL_CALC_FOUND_ROWS *,
                 (SELECT count(*) FROM likes WHERE books.id = liked_book_id)
                 AS likes FROM books`; 
     let values = [];
-
     if (category_id && news) {
         sql += ` WHERE category_id = ? AND datediff(curdate(), pub_date) < 31`;
         values.push(category_id);
@@ -21,6 +18,7 @@ const getBooks = async (val,res)=> {
     }else if (news) {
         sql += ` WHERE datediff(curdate(), pub_date) < 31`;
     }
+
     sql += ' LIMIT ? OFFSET ?'
     values.push(parseInt(limit), offset);
 
@@ -37,14 +35,13 @@ const getBooks = async (val,res)=> {
     }  
     allBooksRes.pagination = pagination;
 
-
     return res.status(StatusCodes.OK).json(allBooksRes);
 }
 
 const detailBook = async (book_id,req,res) => {
     console.log(req.isAuthenticated)
     
-    if (req.isAuthenticated) {        // 권한 허가 시 (true)
+    if (req.isAuthenticated) {      
         let authorization = req.user;
 
         let sql = ` SELECT *,
@@ -55,9 +52,7 @@ const detailBook = async (book_id,req,res) => {
         WHERE books.id = ?`;
 
         let values = [authorization.user_id, book_id, book_id];
-
         let result = await getDetail(res,sql,values);
-
         if (result[0]){
             return res.status(StatusCodes.OK).json(result[0]);
         } else{
@@ -72,9 +67,7 @@ const detailBook = async (book_id,req,res) => {
         JOIN categories ON categories.category_id = books.category_id 
         WHERE books.id = ?`;
         let values = [book_id];
-
         let result = await getDetail(res,sql,values);
-
         if (result[0]){
             return res.status(StatusCodes.OK).json(result[0]);
         } else{
@@ -84,4 +77,4 @@ const detailBook = async (book_id,req,res) => {
 }
 
 
-module.exports = {getBooks, detailBook};
+module.exports = {getBooks, detailBook}; 

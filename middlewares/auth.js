@@ -2,9 +2,6 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const {StatusCodes} = require('http-status-codes');
 const secret = process.env.PRIVATE_KEY;
-const {sign, verify} = require('./jwt-utils');
-
-
 dotenv.config();
 
 const ensureAuth = (req,res,next) => {
@@ -13,7 +10,6 @@ const ensureAuth = (req,res,next) => {
         let receivedJwt = req.headers.authorization;
 
         if (receivedJwt){
-            //let decodedJwt = verify(receivedJwt); //return ok, id, email
             let decodedJwt = jwt.verify(receivedJwt, secret);
             req.isAuthenticated = true;
             req.user = decodedJwt;

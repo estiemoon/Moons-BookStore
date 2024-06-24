@@ -1,14 +1,12 @@
-const {addCartDB, allCartDB,removeCartDB} = require('../models/cartModel'); 
-
+const {addOrRemoveCartDB, allCartDB} = require('../models/cartModel'); 
 const {StatusCodes} = require('http-status-codes');
-
 
 const addCart = async (values,res)=> {
 
     let sql = ` INSERT INTO cartItems (book_id, quantity, user_id)
     VALUES (?,?,?)`;
 
-    const result = await addCartDB(sql,values,res);
+    const result = await addOrRemoveCartDB(sql,values,res);
 
     if(result){
         res.status(StatusCodes.CREATED).json(result);
@@ -39,10 +37,14 @@ const removeCart = async(values,res)=>{
 
     let sql = `DELETE FROM cartItems WHERE id = ?`;
 
-    result = await removeCartDB(sql,values,res)
+    result = await addOrRemoveCartDB(sql,values,res)
 
     if(result){
-        res.status(StatusCodes.CREATED).json(result);
+        if (result.affectedRows){
+            res.status(StatusCodes.CREATED).json(result);
+        } else {
+            res.status(StatusCodes.NOT_FOUND).json(result);
+        }
     }
 }
 

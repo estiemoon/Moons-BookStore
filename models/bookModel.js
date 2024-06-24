@@ -2,8 +2,6 @@
 const {StatusCodes} = require('http-status-codes');
 const mysql = require('mysql2/promise');
 
-
-
 const getAllBooks = async (sql,values,res) => {
     const conn = await mysql.createConnection({
         host: 'localhost',

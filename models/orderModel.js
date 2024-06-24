@@ -21,7 +21,6 @@ const addData = async(sql,val,res) => {
     }
 }
 
-
 const deleteData = async(sql,val,res) => {
     const conn = await mysql.createConnection({
         host: 'localhost',
@@ -81,4 +80,4 @@ const getDetailDB = async(sql,id,res) => {
 
 }
 
-module.exports = {addData,deleteData,getOrderDB,getDetailDB}
+module.exports = {addData,deleteData,getOrderDB,getDetailDB} 

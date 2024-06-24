@@ -1,13 +1,5 @@
 const {getBooks,detailBook} = require('../services/bookService');
 
-const conn = require('../mariadb');
-const {StatusCodes} = require('http-status-codes');
-const ensureAuth = require('../auth');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-dotenv.config();
-
-//카테고리별 Or 신간별 전체도서조회
 const allBooks = (req,res)=> {
     let {category_id, news,limit,currentPage} = req.query;
 
@@ -31,3 +23,4 @@ module.exports = {
     allBooks,
     eachBook
 };
+ 

@@ -1,4 +1,4 @@
-const conn = require('../mariadb');
+const conn = require('../db/mariadb');
 const { StatusCodes} = require('http-status-codes');
 
 const allCategories = (req,res) => {

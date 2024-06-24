@@ -1,8 +1,7 @@
 const {createUser,loginUser,toReset,resetPwd} = require('../services/userService');
 
-
 const join = (req,res)=> {
-    let {email, password} = req.body;
+    const {email, password} = req.body;
     createUser(email,password,res);
 }
 
@@ -17,7 +16,7 @@ const toRequestReset = (req,res)=> {
 }
 
 const requestReset = (req,res)=> {
-    const {email, password} = req.body; //사용자가 입력한 이메일은 아님, 위에서 보내준 이메일임
+    const {email, password} = req.body; 
     resetPwd(email,password,res);
 }
 

@@ -1,5 +1,4 @@
 const { addData,deleteData,getOrderDB,getDetailDB } = require('../models/orderModel');
-
 const {StatusCodes} = require('http-status-codes');
 
 const order = async (values,res) => {
@@ -11,8 +10,8 @@ const order = async (values,res) => {
         let sql1 = `INSERT INTO delivery (address, recipient, phoneNum) 
         VALUES(? ,?, ?)`;
         let val1 = [delivery.address, delivery.recipient, delivery.phoneNum];
-
         let result1 = await addData(sql1,val1,res);
+
         delivery_id = result1.insertId;
 
     } catch(e) {
@@ -24,8 +23,8 @@ const order = async (values,res) => {
         let sql2 = `INSERT INTO orders(book_title, total_quantity, total_price, deliver_id, user_id)
         VALUES (?,?,?,?,?)`;
         let val2 = [bookTitle ,totalQuantity, totalPrice, delivery_id, userId];
-
         let result2 = await addData(sql2,val2,res);
+        
         if (!result2){
             throw new Error;
         };
@@ -35,7 +34,7 @@ const order = async (values,res) => {
         throw e;
     }
 
-    try{ //items = [1,2,3] 주문하는 도서 장바구니 cart 아이디
+    try{ 
         let val3;
         let result3;
         for (const item of items) {
@@ -46,18 +45,14 @@ const order = async (values,res) => {
             val3 = [order_id,item,item];
             result3 = await addData(sql3,val3,res);
         };
-
-        
-
     } catch(e) {
         console.log("sql3 error: ", e);
         throw e;
     }
 
     let result;
-    //삽입 후 삭제 해야하는데 왜 sql5부터 실행이 되냐 이말이야?
     try{
-        result = await deleteCartITem(items,res); //나머지도 모듈로 빼기
+        result = await deleteCartITem(items,res); 
 
     } catch (e) {
         console.log('삭제에러', e);
@@ -113,4 +108,4 @@ const getDetail = async(id,res) => {
 }
 
 
-module.exports = {order, getOrder,getDetail}
+module.exports = {order, getOrder,getDetail} 

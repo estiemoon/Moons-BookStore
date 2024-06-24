@@ -1,18 +1,25 @@
 const express = require('express');
 const {addCartCon, allCartsCon, deleteCartItemCon} = require('../controller/cartController');
 const router = express.Router();
-
 router.use(express.json());
-const ensureAuth = require('../auth');
- 
-//장바구니 담기
-router.post('/', ensureAuth, addCartCon);
 
-//장바구니 목록 조회, 선택한 목록 조회
+const ensureAuth = require('../middlewares/auth');
+const {validFunc} = require('../middlewares/validator');
+const {body} = require('express-validator');
+ 
+
+router.post('/', 
+            ensureAuth,
+            [
+            body('book_id').notEmpty().isInt().withMessage('책 아이디 필요'),
+            body('quantity').notEmpty().isInt().withMessage('책 수량 필요'),
+            validFunc
+            ]        
+            ,addCartCon);
+
 router.get('/', ensureAuth, allCartsCon);
 
-//장바구니 제거
 router.delete('/:id', ensureAuth, deleteCartItemCon);
 
 
-module.exports = router;
+module.exports = router; 

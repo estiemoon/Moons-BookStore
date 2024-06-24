@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const dotenv = require('dotenv');
-const { promisify } = require('util');
 dotenv.config();
 const secret = process.env.PRIVATE_KEY
 const redis = require('redis');
@@ -15,7 +14,7 @@ module.exports = {
         }
         return jwt.sign(payload, 
                         secret,
-                        {expiresIn : "1 min",
+                        {expiresIn : "30 min",
                         issuer : "moon"})
     },
     verify : (token) => {
@@ -44,8 +43,6 @@ module.exports = {
 
         try {
             const data = await redisClient.get(toString(userId));
-            console.log("data : ", data);
-            console.log("token : ", token);
             if (token == data) {
                 try{
                     jwt.verify(token, secret);
@@ -61,7 +58,6 @@ module.exports = {
             } else {
                 return false;
             }
-
             } catch (err) {
                 return false;
             }
