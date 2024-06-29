@@ -1,5 +1,4 @@
 const {addLike, deleteLike} = require('../services/likeService');
-
 const {StatusCodes} = require('http-status-codes');
 
 const addLikeCon = (req,res) => {
@@ -13,7 +12,6 @@ const addLikeCon = (req,res) => {
     } else {
         return res.status(StatusCodes.UNAUTHORIZED).end();
     }
- 
 };
 
 const deleteLikeCon = (req,res) => {
@@ -27,7 +25,6 @@ const deleteLikeCon = (req,res) => {
     } else {
         return res.status(StatusCodes.UNAUTHORIZED).end();
     }
-
 };
 
 module.exports = {addLikeCon, deleteLikeCon};

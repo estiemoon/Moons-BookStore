@@ -1,11 +1,11 @@
 const express = require('express');
-const {orderCon,getOrderCon,getDetailCon} = require('../controller/orderController');
 const router = express.Router();
 router.use(express.json());
 
 const ensureAuth = require('../middlewares/auth');
 const {validFunc} = require('../middlewares/validator');
 const {body} = require('express-validator');
+const {orderCon,getOrderCon,getDetailCon} = require('../controller/orderController');
 
 router.post('/', 
             ensureAuth,

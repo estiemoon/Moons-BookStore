@@ -1,9 +1,9 @@
 const express = require('express');
-const {addLikeCon, deleteLikeCon} = require('../controller/likeController');
-const ensureAuth = require('../middlewares/auth');
 const router = express.Router();
-
 router.use(express.json());
+
+const ensureAuth = require('../middlewares/auth');
+const {addLikeCon, deleteLikeCon} = require('../controller/likeController');
 
 //좋아요 누르기
 router.post('/:id', ensureAuth, addLikeCon);

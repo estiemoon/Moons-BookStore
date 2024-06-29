@@ -1,6 +1,4 @@
-const {StatusCodes} = require('http-status-codes');
 const mysql = require('mysql2/promise');
-
 
 const addData = async(sql,val,res) => {
 

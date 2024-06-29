@@ -1,12 +1,11 @@
 const express = require('express');
-const {addCartCon, allCartsCon, deleteCartItemCon} = require('../controller/cartController');
 const router = express.Router();
 router.use(express.json());
 
 const ensureAuth = require('../middlewares/auth');
 const {validFunc} = require('../middlewares/validator');
 const {body} = require('express-validator');
- 
+const {addCartCon, allCartsCon, deleteCartItemCon} = require('../controller/cartController');
 
 router.post('/', 
             ensureAuth,

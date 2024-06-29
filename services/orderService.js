@@ -1,5 +1,4 @@
 const { addData,deleteData,getOrderDB,getDetailDB } = require('../models/orderModel');
-const {StatusCodes} = require('http-status-codes');
 
 const order = async (values,res) => {
     let delivery_id;

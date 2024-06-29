@@ -1,4 +1,3 @@
-//const conn = require('../mariadb');
 const {StatusCodes} = require('http-status-codes');
 const mysql = require('mysql2/promise');
 

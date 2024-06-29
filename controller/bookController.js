@@ -18,7 +18,6 @@ const eachBook = (req,res) => {
 
 };
 
-
 module.exports = {
     allBooks,
     eachBook

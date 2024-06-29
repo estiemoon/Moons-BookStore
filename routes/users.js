@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {body} = require('express-validator');
 router.use(express.json());
 
-const {join,login,toRequestReset,requestReset} = require('../controller/userController');
+const {body} = require('express-validator');
 const {validFunc} = require('../middlewares/validator');
 const excRefresh = require('../middlewares/refresh');
+const {join,login,toRequestReset,requestReset} = require('../controller/userController');
+
 
 const validateEmailAndPwd = [ 
                         body('email').notEmpty().isString().withMessage('이메일 필요'),

@@ -10,7 +10,6 @@ const allCategories = (req,res) => {
                 return res.status(StatusCodes.BAD_REQUEST).end();
             }
             return res.status(StatusCodes.OK).json(result);
-
     })
 }
 
